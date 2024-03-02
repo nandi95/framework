@@ -16,6 +16,7 @@ use Illuminate\Contracts\Queue\ShouldBeUniqueUntilProcessing;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Log\Context\Repository as ContextRepository;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Queue\Middleware\Debounced;
 use Illuminate\Queue\Attributes\DeleteWhenMissingModels;
 use ReflectionClass;
 use RuntimeException;
@@ -117,7 +118,11 @@ class CallQueuedHandler
         }
 
         return (new Pipeline($this->container))->send($command)
-            ->through(array_merge(method_exists($command, 'middleware') ? $command->middleware() : [], $command->middleware ?? []))
+                ->through(array_merge(
+                    method_exists($command, 'middleware') ? $command->middleware() : [],
+                        $command->middleware ?? [],
+                    [new Debounced()]
+                ))
             ->then(function ($command) use ($job) {
                 if ($command instanceof ShouldBeUniqueUntilProcessing) {
                     $this->ensureUniqueJobLockIsReleased($command);
