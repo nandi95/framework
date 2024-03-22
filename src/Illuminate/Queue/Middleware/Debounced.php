@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Illuminate\Queue\Middleware;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
@@ -18,16 +20,6 @@ class Debounced
      */
     public function handle(mixed $job, $next)
     {
-        if (($job->connection ?? $job->job->getConnectionName()) === 'sync') {
-
-//            if (config('app.debug') && app()->isLocal()) {
-//                throw new \LogicException('Debounced jobs must not run on the sync queue.');
-//            }
-
-            $next($job);
-            return;
-        }
-
         $key = 'debounced.'.get_class($job);
 
         if ($job instanceof ShouldBeUnique && method_exists($job, 'uniqueId')) {
@@ -35,26 +27,51 @@ class Debounced
             $key .= '.uniqueBy.'.$job->uniqueId();
         }
 
-        $intendedExecutionTime = cache()->pull($key);
+        /** @var Repository $cache */
+        $cache = Container::getInstance()->get(Repository::class);
 
-        if (
-            // if there's a value for this key, this is a debounced job
-            ! is_null($intendedExecutionTime) &&
-            ! in_array(InteractsWithQueue::class, class_uses_recursive($job), true)
-        ) {
-            // using the class-string so there's a hard reference
-            $traitName = class_basename(InteractsWithQueue::class);
-            throw new \InvalidArgumentException("The Debounced jobs must use the $traitName trait.");
+        // todo - this could be a performance issue? always reaching into the cache?
+        $intendedExecutionTime = $cache->pull($key);
+
+        $isDebounced = !is_null($intendedExecutionTime);
+        $itInteractsWithQueue = in_array(InteractsWithQueue::class, class_uses_recursive($job), true);
+
+        $connection = $job->connection ?? null;
+
+        if (is_null($connection) && $itInteractsWithQueue) {
+            $connection = $job->job?->getConnectionName();
         }
 
-        $count = cache()->pull($key.'.count', 1);
+        if ($connection === 'sync') {
+            if ($isDebounced) {
+                // todo - add config('app.debug') && app()->isLocal() to warn developer
+                throw new \LogicException('Debounced jobs must not run on the sync queue.');
+            }
+
+            $next($job);
+            return;
+        }
+
+        if (! $itInteractsWithQueue) {
+            if ($isDebounced) {
+                // using the class-string so there's a hard reference
+                $traitName = class_basename(InteractsWithQueue::class);
+                throw new \InvalidArgumentException("The Debounced jobs must use the $traitName trait.");
+            }
+
+            $next($job);
+            return;
+        }
+
+        $count = $cache->pull($key.'.count', 1);
 
         if ($count > 1) {
             // this is an earlier job, so we should delete it
             $job->delete();
 
             // decrement the count
-            cache()->forever($key.'.count', $count - 1);
+            // todo - use decrement() instead?
+            $cache->forever($key.'.count', $count - 1);
             return;
         }
 
