@@ -69,9 +69,7 @@ class Debounced
             // this is an earlier job, so we should delete it
             $job->delete();
 
-            // decrement the count
-            // todo - use decrement() instead?
-            $cache->forever($key.'.count', $count - 1);
+            $cache->decrement($key.'.count', $count - 1);
             return;
         }
 
