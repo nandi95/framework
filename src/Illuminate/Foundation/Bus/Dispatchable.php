@@ -4,7 +4,9 @@ namespace Illuminate\Foundation\Bus;
 
 use Closure;
 use Illuminate\Bus\Queueable;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Support\Fluent;
 
@@ -66,8 +68,11 @@ trait Dispatchable
             $key .= '.uniqueBy.'.$dispatchable->uniqueId();
         }
 
-        cache()->forever($key, now()->addSeconds($wait)->toISOString());
-        cache()->increment($key.'.count');
+        /** @var Repository $cache */
+        $cache = Container::getInstance()->get(Repository::class);
+
+        $cache->forever($key, now()->addSeconds($wait)->toISOString());
+        $cache->increment($key.'.count');
 
         return (new PendingDispatch($dispatchable))->delay($wait);
     }
