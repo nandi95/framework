@@ -122,6 +122,7 @@ class RateLimitedWithRedisTest extends TestCase
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
         $job->shouldReceive('delete')->once();
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($testJob),
@@ -141,6 +142,7 @@ class RateLimitedWithRedisTest extends TestCase
         $job->shouldReceive('release')->once();
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($testJob),
@@ -160,6 +162,7 @@ class RateLimitedWithRedisTest extends TestCase
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
         $job->shouldReceive('delete')->once();
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($testJob),

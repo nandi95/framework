@@ -73,6 +73,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $job->shouldReceive('release')->with(0)->once();
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command = new $class($key)),
@@ -94,6 +95,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         })->once();
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command = new $class($key)),
@@ -113,6 +115,7 @@ class ThrottlesExceptionsWithRedisTest extends TestCase
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
         $job->shouldReceive('delete')->once();
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command = new $class($key)),

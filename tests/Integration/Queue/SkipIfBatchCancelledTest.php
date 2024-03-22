@@ -47,6 +47,7 @@ class SkipIfBatchCancelledTest extends TestCase
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
         $job->shouldReceive('delete')->once();
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command = $class),

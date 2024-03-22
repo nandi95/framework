@@ -27,6 +27,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('delete')->once();
 
         $instance->call($job, [
@@ -45,6 +46,7 @@ class CallQueuedHandlerTest extends TestCase
 
         $job = m::mock(Job::class);
         $job->shouldReceive('hasFailed')->andReturn(false);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
@@ -68,6 +70,7 @@ class CallQueuedHandlerTest extends TestCase
 
         $job = m::mock(Job::class);
         $job->shouldReceive('hasFailed')->andReturn(false);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('isDeleted')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);

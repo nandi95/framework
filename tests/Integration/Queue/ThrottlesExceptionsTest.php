@@ -52,6 +52,7 @@ class ThrottlesExceptionsTest extends TestCase
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
         $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -74,6 +75,7 @@ class ThrottlesExceptionsTest extends TestCase
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
         $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -94,6 +96,7 @@ class ThrottlesExceptionsTest extends TestCase
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
         $job->shouldReceive('delete')->once();
         $job->shouldReceive('uuid')->andReturn('simple-test-uuid');
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),

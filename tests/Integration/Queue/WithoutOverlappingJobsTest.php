@@ -25,6 +25,7 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
         $job->shouldReceive('delete')->once();
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command = new OverlappingTestJob),
@@ -46,6 +47,7 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $this->expectException(Exception::class);
 
@@ -75,6 +77,7 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(true);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command),
@@ -97,6 +100,7 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(false);
         $job->shouldReceive('delete')->once();
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command),
@@ -119,6 +123,7 @@ class WithoutOverlappingJobsTest extends QueueTestCase
         $job->shouldReceive('hasFailed')->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->andReturn(true);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize(new OverlappingTestJobWithSharedKeyOne),

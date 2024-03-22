@@ -86,6 +86,7 @@ class RateLimitedTest extends TestCase
             return $delay >= 0;
         });
         $job->shouldReceive('isReleased')->andReturn(true);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
 
         $instance->call($job, [
@@ -164,6 +165,7 @@ class RateLimitedTest extends TestCase
         $job->shouldReceive('hasFailed')->once()->andReturn(false);
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
         $job->shouldReceive('delete')->once();
 
         $instance->call($job, [
@@ -184,6 +186,7 @@ class RateLimitedTest extends TestCase
         $job->shouldReceive('release')->once();
         $job->shouldReceive('isReleased')->andReturn(true);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(true);
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
@@ -203,6 +206,7 @@ class RateLimitedTest extends TestCase
         $job->shouldReceive('isReleased')->andReturn(false);
         $job->shouldReceive('isDeletedOrReleased')->once()->andReturn(false);
         $job->shouldReceive('delete')->once();
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
 
         $instance->call($job, [
             'command' => serialize($command = new $class),
