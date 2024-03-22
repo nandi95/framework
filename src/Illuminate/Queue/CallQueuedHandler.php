@@ -119,9 +119,9 @@ class CallQueuedHandler
 
         return (new Pipeline($this->container))->send($command)
                 ->through(array_merge(
+                    [new Debounced()],
                     method_exists($command, 'middleware') ? $command->middleware() : [],
-                    $command->middleware ?? [],
-                    [new Debounced()]
+                    $command->middleware ?? []
                 ))
             ->then(function ($command) use ($job) {
                 if ($command instanceof ShouldBeUniqueUntilProcessing) {
