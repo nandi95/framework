@@ -67,7 +67,10 @@ class QueueSyncQueueTest extends TestCase
         $container->bind(\Illuminate\Contracts\Events\Dispatcher::class, \Illuminate\Events\Dispatcher::class);
         $container->bind(\Illuminate\Contracts\Bus\Dispatcher::class, \Illuminate\Bus\Dispatcher::class);
         $container->bind(\Illuminate\Contracts\Container\Container::class, \Illuminate\Container\Container::class);
+        $container->bind(\Illuminate\Contracts\Cache\Store::class, \Illuminate\Cache\ArrayStore::class);
+        $container->bind(\Illuminate\Contracts\Cache\Repository::class, \Illuminate\Cache\Repository::class);
         $sync->setContainer($container);
+        Container::setInstance($container);
 
         SyncQueue::createPayloadUsing(function ($connection, $queue, $payload) {
             return ['data' => ['extra' => 'extraValue']];
