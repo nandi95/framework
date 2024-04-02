@@ -135,6 +135,23 @@ class JobDispatchingTest extends QueueTestCase
         $this->assertFalse(UniqueJob::$ran);
     }
 
+    public function testChecksRequirementsForDebounceDispatching()
+    {
+        try {
+            Job::dispatchDebounced(2, 'test');
+            $this->fail('It did not throw th expected error.');
+        } catch (\Throwable $e) {
+            $this->assertSame('The Debounced jobs must use the InteractsWithQueue trait.', $e->getMessage());
+        }
+
+        try {
+            UniqueJob::dispatchDebounced(2, 'test');
+            $this->fail('It did not throw th expected error.');
+        } catch (\Throwable $e) {
+            $this->assertSame('Debounced jobs cannot run on the sync queue.', $e->getMessage());
+        }
+    }
+
     /**
      * Helpers.
      */

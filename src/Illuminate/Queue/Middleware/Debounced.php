@@ -45,7 +45,7 @@ class Debounced
         if ($connection === 'sync') {
             if ($isDebounced) {
                 // todo - add config('app.debug') && app()->isLocal() to warn developer
-                throw new \LogicException('Debounced jobs must not run on the sync queue.');
+                throw new \LogicException('Debounced jobs cannot run on the sync queue.');
             }
 
             $next($job);
