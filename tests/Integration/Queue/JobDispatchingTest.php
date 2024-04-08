@@ -7,6 +7,7 @@ use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 use Illuminate\Queue\InteractsWithQueue;
 use Orchestra\Testbench\Attributes\WithMigration;
 
@@ -14,6 +15,8 @@ use Orchestra\Testbench\Attributes\WithMigration;
 #[WithMigration('queue')]
 class JobDispatchingTest extends QueueTestCase
 {
+    use InteractsWithRedis;
+
     protected function setUp(): void
     {
         $this->beforeApplicationDestroyed(function () {
