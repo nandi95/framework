@@ -53,13 +53,13 @@ trait Dispatchable
     // todo - add \DateTimeInterface|\DateInterval as accepted types for wait
     public static function dispatchDebounced(int $wait, ...$arguments): PendingDispatch
     {
-        $dispatchable = new static(...$arguments);
-
-        if (!in_array(Queueable::class, class_uses_recursive(static::class), true)) {
+        if (! in_array(Queueable::class, class_uses_recursive(static::class), true)) {
             throw new \InvalidArgumentException(
-                'Debounced jobs must use the '.class_basename(Queueable::class). ' trait.'
+                'Debounced jobs must use the '.class_basename(Queueable::class).' trait.'
             );
         }
+
+        $dispatchable = new static(...$arguments);
 
         $key = 'debounced.'.get_class($dispatchable);
 
@@ -71,10 +71,11 @@ trait Dispatchable
         /** @var Repository $cache */
         $cache = Container::getInstance()->get(Repository::class);
 
+        // set the intended execution time
         $cache->forever($key, now()->addSeconds($wait)->toISOString());
         $cache->increment($key.'.count');
 
-        return (new PendingDispatch($dispatchable))->delay($wait);
+        return static::newPendingDispatch($dispatchable)->delay($wait);
     }
 
     /**
